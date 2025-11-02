@@ -2,4 +2,7 @@ streamlit
 gspread
 oauth2client
 pandas
-altai
+altair
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
