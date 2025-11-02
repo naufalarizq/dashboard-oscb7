@@ -1,0 +1,36 @@
+# === Python cache ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.log
+
+# === Virtual environment ===
+.venv/
+venv/
+env/
+ENV/
+*.env
+
+# === Jupyter/Streamlit cache ===
+.streamlit/secrets.toml
+.streamlit/config.toml
+.cache/
+.streamlit_cache/
+.streamlit/
+
+# === Data files (optional) ===
+data/*.csv
+data/*.xlsx
+data/*.xls
+
+# === OS / Editor ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === Misc ===
+*.bak
+*.swp
