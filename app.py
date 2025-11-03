@@ -314,11 +314,11 @@ if not df_clean.empty:
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Batch 60")
-        rank_60 = leaderboard[leaderboard['Batch'] == 60].sort_values(by='Points', ascending=False).head(3)
+        rank_60 = leaderboard[leaderboard['Batch'] == 60].sort_values(by='Points', ascending=False).head(5)
         st.dataframe(rank_60, use_container_width=True, hide_index=True)
     with col2:
         st.subheader("Batch 61")
-        rank_61 = leaderboard[leaderboard['Batch'] == 61].sort_values(by='Points', ascending=False).head(3)
+        rank_61 = leaderboard[leaderboard['Batch'] == 61].sort_values(by='Points', ascending=False).head(5)
         st.dataframe(rank_61, use_container_width=True, hide_index=True)
 
     st.markdown("---")
