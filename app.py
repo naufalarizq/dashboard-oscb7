@@ -106,7 +106,8 @@ if not df_clean.empty:
 
         if total_records > 0:
             st.subheader("📋 Your Achievement Records")
-            st.dataframe(df_user, use_container_width=True, hide_index=True).drop['Achievement_Date', 'Month_Year', 'Batch', 'Faculty', 'Major']
+            df_user_data = df_user.drop(columns=['Achievement_Date', 'Month_Year', 'Batch', 'Faculty', 'Major'])
+            st.dataframe(df_user_data, use_container_width=True, hide_index=True)
 
             st.subheader("📈 Your Monthly Trend")
             if 'Month_Year' in df_user.columns:
