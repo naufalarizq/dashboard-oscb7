@@ -4,25 +4,25 @@ from modules.data_loader import load_clean_data
 from modules.scoring import calculate_points
 from modules.constants import CATEGORY_ORDER, FACULTY_ORDER, LEVEL_ORDER
 from modules.charts import faculty_chart, level_pie_chart
+from modules.auth import login  # ✅ import modul login yang tadi
 
 st.set_page_config(page_title="Student Achievement Dashboard", layout="wide")
 st.title("🚀 Achievement Dashboard OSC Batch 7")
 
-# Tombol refresh cache
+# === Tombol Refresh ===
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
 
-# Load data
+# === Load Data ===
 df_clean = load_clean_data()
 
 if not df_clean.empty:
-    st.header("Achievement Summary")
+    # --- Bagian Publik ---
+    st.header("🏆 Overall Achievement Summary")
 
-    # Total pencapaian
     total_records = len(df_clean.dropna(subset=['StudentID']))
     st.metric("Total Recorded Achievements", value=total_records)
 
-    # Jumlah per kategori
     category_counts = df_clean['Category'].value_counts().reindex(CATEGORY_ORDER, fill_value=0)
     cols = st.columns(len(category_counts))
     for i, (cat, count) in enumerate(category_counts.items()):
@@ -30,8 +30,8 @@ if not df_clean.empty:
 
     st.markdown("---")
 
-    # Top 5 per batch
-    st.header("🏆 Top 5 Students by Batch")
+    # === Leaderboard Umum ===
+    st.header("🏅 Top 5 Students by Batch")
     df_points = calculate_points(df_clean.copy())
     leaderboard = df_points.groupby(['StudentID', 'FullName', 'Batch'])['Points'].sum().reset_index()
 
@@ -51,7 +51,7 @@ if not df_clean.empty:
 
     st.markdown("---")
 
-    # Distribusi capaian
+    # === Grafik Umum ===
     st.header("📊 Achievement Distribution")
     col1, col2 = st.columns(2)
     with col1:
@@ -63,6 +63,7 @@ if not df_clean.empty:
 
     st.markdown("---")
 
+    # === Tren Bulanan Umum ===
     st.header("📈 Monthly Achievement Trends")
 
     if 'Month_Year' in df_clean.columns:
@@ -75,3 +76,38 @@ if not df_clean.empty:
 
     else:
         st.warning("Column 'Month_Year' (with date) not found.")
+
+    st.markdown("---")
+
+    # --- Bagian Login Mahasiswa ---
+    st.header("🎓 View Your Personal Achievement Records")
+
+    if "logged_in" not in st.session_state or not st.session_state.logged_in:
+        st.info("🔒 Please log in to see your own achievements.")
+        login()
+    else:
+        st.success(f"Welcome back, {st.session_state.user_name}!")
+        user_id = st.session_state.user_id
+        df_user = df_clean[df_clean["StudentID"] == user_id]
+
+        total_records = len(df_user)
+        st.metric("Your Total Achievements", value=total_records)
+
+        if total_records > 0:
+            st.subheader("📋 Your Achievement Records")
+            st.dataframe(df_user, use_container_width=True, hide_index=True)
+
+            st.subheader("📈 Your Monthly Trend")
+            if 'Month_Year' in df_user.columns:
+                monthly_counts = (
+                    df_user.dropna(subset=['Month_Year'])
+                    .groupby('Month_Year')
+                    .size()
+                    .sort_index()
+                )
+                st.line_chart(monthly_counts)
+        else:
+            st.warning("You don’t have any recorded achievements yet.")
+
+else:
+    st.error("❌ Failed to load data. Check your secrets configuration.")
