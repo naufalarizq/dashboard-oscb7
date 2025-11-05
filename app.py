@@ -246,7 +246,7 @@ def calculate_points(df):
 # DASHBOARD CONFIG
 # ==========================
 st.set_page_config(page_title="Student Achievement Dashboard", layout="wide")
-st.title("🚀 Student Achievement Dashboard (OSC Batch 7)")
+st.title("🚀 Achievement Dashboard OSC Batch 7")
 
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
@@ -305,7 +305,7 @@ if not df_clean.empty:
     st.markdown("---")
 
     # === LEADERBOARD ===
-    st.header("🏆 Top 3 Students by Batch")
+    st.header("🏆 Top 5 Students by Batch")
     st.info("Now using official scoring system ✅")
 
     df_points = calculate_points(df_clean.copy())
