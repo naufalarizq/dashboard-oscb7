@@ -8,24 +8,29 @@ from modules.charts import faculty_chart, level_pie_chart
 st.set_page_config(page_title="Student Achievement Dashboard", layout="wide")
 st.title("🚀 Achievement Dashboard OSC Batch 7")
 
+# Tombol refresh cache
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
 
+# Load data
 df_clean = load_clean_data()
 
 if not df_clean.empty:
     st.header("Achievement Summary")
 
+    # Total pencapaian
     total_records = len(df_clean.dropna(subset=['StudentID']))
     st.metric("Total Recorded Achievements", value=total_records)
-    category_counts = df_clean['Category'].value_counts().reindex(CATEGORY_ORDER, fill_value=0)
 
+    # Jumlah per kategori
+    category_counts = df_clean['Category'].value_counts().reindex(CATEGORY_ORDER, fill_value=0)
     cols = st.columns(len(category_counts))
     for i, (cat, count) in enumerate(category_counts.items()):
         cols[i].metric(cat, count)
 
     st.markdown("---")
 
+    # Top 5 per batch
     st.header("🏆 Top 5 Students by Batch")
     df_points = calculate_points(df_clean.copy())
     leaderboard = df_points.groupby(['StudentID', 'FullName', 'Batch'])['Points'].sum().reset_index()
@@ -46,6 +51,7 @@ if not df_clean.empty:
 
     st.markdown("---")
 
+    # Distribusi capaian
     st.header("📊 Achievement Distribution")
     col1, col2 = st.columns(2)
     with col1:
@@ -57,14 +63,27 @@ if not df_clean.empty:
 
     st.markdown("---")
 
+    # Tren bulanan
     st.header("📈 Monthly Achievement Trends")
+
     if 'Month_Year' in df_clean.columns:
-        monthly_counts = (
-            df_clean.dropna(subset=['Month_Year'])
-            .groupby('Month_Year').size().sort_index()
-        )
-        st.line_chart(monthly_counts)
+        # Pastikan kolom berisi datetime valid
+        df_clean['Month_Year'] = pd.to_datetime(df_clean['Month_Year'], errors='coerce')
+
+        # Hapus nilai NaT
+        df_clean = df_clean.dropna(subset=['Month_Year'])
+
+        if not df_clean.empty:
+            # Hitung jumlah per bulan (tanpa NaT)
+            monthly_counts = (
+                df_clean.groupby(df_clean['Month_Year'].dt.to_period('M')).size().sort_index()
+            )
+            # Ubah period ke timestamp biar tampil rapi di sumbu X
+            monthly_counts.index = monthly_counts.index.to_timestamp()
+            st.line_chart(monthly_counts)
+        else:
+            st.info("No valid date data found for Monthly Trends.")
     else:
-        st.warning("Column 'Year' not found.")
+        st.warning("Column 'Month_Year' not found.")
 else:
     st.error("Failed to load data. Check your secrets configuration.")
