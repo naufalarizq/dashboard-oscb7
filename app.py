@@ -66,19 +66,12 @@ if not df_clean.empty:
     st.header("📈 Monthly Achievement Trends")
 
     if 'Month_Year' in df_clean.columns:
-        valid_monthly = df_clean.dropna(subset=['Achievement_Date', 'Month_Year'])
-
-        monthly_counts = (
-            valid_monthly
-            .groupby('Month_Year')
-            .size()
-            .sort_index()
-        )
+        valid_monthly = df_clean.dropna(subset=['Achievement_Date'])
+        monthly_counts = valid_monthly.dropna(subset=['Month_Year']) \
+                        .groupby('Month_Year') \
+                        .size().sort_index()
 
         st.line_chart(monthly_counts)
 
     else:
         st.warning("Column 'Month_Year' (with date) not found.")
-
-
-
