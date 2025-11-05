@@ -91,7 +91,19 @@ if not df_clean.empty:
         df_user = df_clean[df_clean["StudentID"] == user_id]
 
         total_records = len(df_user)
-        st.metric("Your Total Achievements", value=total_records)
+
+        # ✅ Hitung total points pribadi
+        if "Points" in df_user.columns:
+            total_points = df_user["Points"].sum()
+        else:
+            total_points = 0
+
+        # ✅ Tampilkan metric berdampingan
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Your Total Achievements", value=total_records)
+        with col2:
+            st.metric("🏆 Your Total Points", value=total_points)
 
         if total_records > 0:
             st.subheader("📋 Your Achievement Records")

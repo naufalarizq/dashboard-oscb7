@@ -30,7 +30,6 @@ def load_user_database():
             return pd.DataFrame(columns=["StudentID", "FullName", "Faculty", "Batch", "Email", "PasswordHash"])
         return df
     except FileNotFoundError:
-        # 2️⃣ fallback ke secrets.toml
         users = st.secrets.get("users", {})
         if not users:
             st.warning("⚠️ Tidak ada data user ditemukan di secrets.toml")
@@ -38,7 +37,7 @@ def load_user_database():
 
         data = []
         for sid, info in users.items():
-            raw_pw = str(info.get("password", sid[-6:]))  # pakai password dari secrets atau default
+            raw_pw = str(info.get("password", sid[-6:]))
             data.append({
                 "StudentID": sid,
                 "FullName": info.get("name", "Unknown"),
@@ -63,7 +62,7 @@ def login():
         st.title("🔐 Student Login")
 
         nim = st.text_input("Student ID (NIM)")
-        password = st.text_input("Password (6 digits from your NIM)", type="password")
+        password = st.text_input("Password", type="password")
 
         if st.button("Login"):
             hashed_pw = hash_password(password)
@@ -90,11 +89,10 @@ def login():
             st.session_state.user_id = None
             st.session_state.user_name = None
             st.rerun()
-        return True  # sudah login
+        return True
     return st.session_state.logged_in
 
 
-# ✅ ubah password (opsional)
 def change_password(student_id, old_password, new_password):
     db = load_user_database()
     hashed_old = hash_password(old_password)
