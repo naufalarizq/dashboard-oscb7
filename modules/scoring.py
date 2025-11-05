@@ -195,6 +195,8 @@ def calculate_points(df):
         return df
 
     def get_score(row):
+        if pd.isna(row.get("Category")) or pd.isna(row.get("Achievement")) or pd.isna(row.get("Level")):
+            return 0
         key = (row["Category"], row["Achievement"], row["Level"])
         if key in scoring_table:
             return scoring_table[key]
