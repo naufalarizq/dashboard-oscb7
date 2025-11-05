@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 def calculate_points(df):
     scoring_table = {
