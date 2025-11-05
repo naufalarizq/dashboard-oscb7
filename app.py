@@ -92,11 +92,10 @@ if not df_clean.empty:
 
         total_records = len(df_user)
 
-        # ✅ Hitung total points pribadi
-        if "Points" in df_user.columns:
-            total_points = df_user["Points"].sum()
-        else:
-            total_points = 0
+        # Hitung ulang poin user berdasarkan data pribadinya
+        df_user_points = calculate_points(df_user.copy())
+        total_records = len(df_user_points)
+        total_points = df_user_points["Points"].sum()
 
         # ✅ Tampilkan metric berdampingan
         col1, col2 = st.columns(2)
