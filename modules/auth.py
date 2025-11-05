@@ -16,9 +16,19 @@ def get_gspread_client():
 
 @st.cache_data
 def load_user_database():
-    df = pd.read_csv("data/database.csv")
-    df["Password"] = df["Student ID"].astype(str).apply(lambda x: hashlib.sha256(x[-6:].encode()).hexdigest())
-    return df
+    # coba baca dari local dulu
+    try:
+        return pd.read_csv("data/database.csv")
+    except FileNotFoundError:
+        # fallback: ambil dari Streamlit secrets
+        data = st.secrets.get("users", {})
+        if not data:
+            st.error("No user data found. Please upload 'data/database.csv' or configure Streamlit secrets.")
+            return pd.DataFrame(columns=["StudentID", "FullName", "Password"])
+        df = pd.DataFrame([
+            {"StudentID": k, "FullName": v, "Password": k[-6:]} for k, v in data.items()
+        ])
+        return df
 
 def login():
     db = load_user_database()
