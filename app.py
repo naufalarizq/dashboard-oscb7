@@ -63,27 +63,22 @@ if not df_clean.empty:
 
     st.markdown("---")
 
-    # Tren bulanan
     st.header("📈 Monthly Achievement Trends")
 
     if 'Month_Year' in df_clean.columns:
-        # Pastikan kolom berisi datetime valid
-        df_clean['Month_Year'] = pd.to_datetime(df_clean['Month_Year'], errors='coerce')
+        valid_monthly = df_clean.dropna(subset=['Achievement_Date', 'Month_Year'])
 
-        # Hapus nilai NaT
-        df_clean = df_clean.dropna(subset=['Month_Year'])
+        monthly_counts = (
+            valid_monthly
+            .groupby('Month_Year')
+            .size()
+            .sort_index()
+        )
 
-        if not df_clean.empty:
-            # Hitung jumlah per bulan (tanpa NaT)
-            monthly_counts = (
-                df_clean.groupby(df_clean['Month_Year'].dt.to_period('M')).size().sort_index()
-            )
-            # Ubah period ke timestamp biar tampil rapi di sumbu X
-            monthly_counts.index = monthly_counts.index.to_timestamp()
-            st.line_chart(monthly_counts)
-        else:
-            st.info("No valid date data found for Monthly Trends.")
+        st.line_chart(monthly_counts)
+
     else:
-        st.warning("Column 'Month_Year' not found.")
-else:
-    st.error("Failed to load data. Check your secrets configuration.")
+        st.warning("Column 'Month_Year' (with date) not found.")
+
+
+
