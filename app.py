@@ -4,7 +4,7 @@ from modules.data_loader import load_clean_data
 from modules.scoring import calculate_points
 from modules.constants import CATEGORY_ORDER, FACULTY_ORDER, LEVEL_ORDER
 from modules.charts import faculty_chart, level_pie_chart
-from modules.auth import login  # ✅ import modul login yang tadi
+from modules.auth import login, change_password
 
 st.set_page_config(page_title="Student Achievement Dashboard", layout="wide")
 st.title("🚀 Achievement Dashboard OSC Batch 7")
@@ -96,6 +96,9 @@ if not df_clean.empty:
         df_user_points = calculate_points(df_user.copy())
         total_records = len(df_user_points)
         total_points = df_user_points["Points"].sum()
+        
+        with st.expander("Change Password 🔑"):
+        change_password()
 
         # ✅ Tampilkan metric berdampingan
         col1, col2 = st.columns(2)

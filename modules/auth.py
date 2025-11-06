@@ -4,6 +4,10 @@ import streamlit as st
 import pandas as pd
 import hashlib
 
+# === KONFIGURASI ===
+SHEET_KEY_DB = "1LoptadYNUgEJ9fHJShdwwCz2O-F-cxLAJ6YgucO2UrA"
+WORKSHEET_NAME_DB = "DatabaseScholars"
+
 # ✅ hash password
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -19,91 +23,104 @@ def get_gspread_client():
     ])
     return gspread.authorize(scoped_creds)
 
-# ✅ load user database (bisa dari lokal atau secrets)
+#load user database
 @st.cache_data
 def load_user_database():
-    # 1️⃣ coba baca dari file CSV lokal dulu
-    try:
-        df = pd.read_csv("data/database.csv")
-        if "StudentID" not in df.columns or "PasswordHash" not in df.columns:
-            st.warning("File database.csv tidak memiliki kolom yang sesuai.")
-            return pd.DataFrame(columns=["StudentID", "FullName", "Faculty", "Batch", "Email", "PasswordHash"])
-        return df
-    except FileNotFoundError:
-        users = st.secrets.get("users", {})
-        if not users:
-            st.warning("⚠️ Tidak ada data user ditemukan di secrets.toml")
-            return pd.DataFrame(columns=["StudentID", "FullName", "Faculty", "Batch", "Email", "PasswordHash"])
+    gc = get_gspread_client()
+    sh = gc.open_by_key(SHEET_KEY_DB    )
+    ws = sh.worksheet(WORKSHEET_NAME_DB)
+    data = ws.get_all_records()
+    return pd.DataFrame(data), ws
 
-        data = []
-        for sid, info in users.items():
-            raw_pw = str(info.get("password", sid[-6:]))
-            data.append({
-                "StudentID": sid,
-                "FullName": info.get("name", "Unknown"),
-                "Faculty": info.get("faculty", "-"),
-                "Batch": info.get("batch", "-"),
-                "Email": info.get("email", "-"),
-                "PasswordHash": hash_password(raw_pw)
-            })
-
-        return pd.DataFrame(data)
-
-# ✅ fungsi login
+# === LOGIN ===
 def login():
-    db = load_user_database()
+    df, _ = load_user_database()
 
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
         st.session_state.user_id = None
         st.session_state.user_name = None
+        st.session_state.user_faculty = None
+        st.session_state.user_batch = None
 
     if not st.session_state.logged_in:
-        st.title("🔐 Student Login")
+        st.subheader("🔐 Student Login")
 
         nim = st.text_input("Student ID (NIM)")
         password = st.text_input("Password", type="password")
 
         if st.button("Login"):
             hashed_pw = hash_password(password)
-            user = db[
-                (db["StudentID"].astype(str) == nim) &
-                (db["PasswordHash"] == hashed_pw)
+            user = df[
+                (df["Student ID"].astype(str) == nim) &
+                ((df["Password"] == password) | (df["PasswordHash"] == hashed_pw))
             ]
 
             if not user.empty:
+                user_data = user.iloc[0]
                 st.session_state.logged_in = True
-                st.session_state.user_id = user.iloc[0]["StudentID"]
-                st.session_state.user_name = user.iloc[0]["FullName"]
-                st.session_state.user_faculty = user.iloc[0]["Faculty"]
-                st.session_state.user_email = user.iloc[0]["Email"]
-                st.success(f"Welcome, {st.session_state.user_name}! 🎉")
+                st.session_state.user_id = user_data["Student ID"]
+                st.session_state.user_name = user_data["Name"]
+                st.session_state.user_faculty = user_data["Faculty"]
+                st.session_state.user_batch = user_data["Batch"]
+                st.success(f"Welcome, {user_data['Name']}!")
                 st.rerun()
             else:
-                st.error("❌ Invalid Student ID or password.")
-
+                st.error("❌ Invalid NIM or password.")
     else:
         st.sidebar.success(f"Logged in as: {st.session_state.user_name}")
         if st.sidebar.button("Logout"):
             st.session_state.logged_in = False
             st.session_state.user_id = None
             st.session_state.user_name = None
+            st.session_state.user_faculty = None
+            st.session_state.user_batch = None
             st.rerun()
+
         return True
+
     return st.session_state.logged_in
 
 
-def change_password(student_id, old_password, new_password):
-    db = load_user_database()
-    hashed_old = hash_password(old_password)
-    user = db[
-        (db["StudentID"].astype(str) == student_id) &
-        (db["PasswordHash"] == hashed_old)
-    ]
+# === GANTI PASSWORD ===
+def change_password():
+    if not st.session_state.get("logged_in"):
+        st.warning("Please log in first.")
+        return
 
-    if user.empty:
-        return False, "Password lama salah."
+    st.subheader("🔑 Change Your Password")
 
-    db.loc[db["StudentID"] == student_id, "PasswordHash"] = hash_password(new_password)
-    db.to_csv("data/database.csv", index=False)
-    return True, "Password berhasil diubah."
+    current_pw = st.text_input("Current Password", type="password")
+    new_pw = st.text_input("New Password", type="password")
+    confirm_pw = st.text_input("Confirm New Password", type="password")
+
+    if st.button("Update Password"):
+        if new_pw != confirm_pw:
+            st.error("❌ New passwords do not match.")
+            return
+
+        df, ws = load_user_database()
+        user_id = st.session_state.user_id
+        user_idx = df.index[df["Student ID"].astype(str) == str(user_id)].tolist()
+
+        if not user_idx:
+            st.error("User not found in database.")
+            return
+
+        i = user_idx[0]
+        stored_pw = str(df.iloc[i]["Password"])
+        stored_hash = str(df.iloc[i]["PasswordHash"])
+
+        # verifikasi current password
+        if current_pw != stored_pw and hash_password(current_pw) != stored_hash:
+            st.error("❌ Current password incorrect.")
+            return
+
+        # hash dan update di Google Sheet
+        new_hash = hash_password(new_pw)
+        pw_col = df.columns.get_loc("Password") + 1
+        hash_col = df.columns.get_loc("PasswordHash") + 1
+        ws.update_cell(i + 2, pw_col, new_pw)
+        ws.update_cell(i + 2, hash_col, new_hash)
+
+        st.success("✅ Password updated successfully!")
