@@ -24,13 +24,41 @@ def get_gspread_client():
     return gspread.authorize(scoped_creds)
 
 #load user database
-@st.cache_data
+# ✅ Load user database dan worksheet-nya
+@st.cache_data(show_spinner=False)
 def load_user_database():
-    gc = get_gspread_client()
-    sh = gc.open_by_key(SHEET_KEY_DB)
-    ws = sh.worksheet(WORKSHEET_NAME_DB)
-    data = ws.get_all_records()
-    return pd.DataFrame(data), ws
+    """
+    Mengambil data user dari Google Spreadsheet.
+    Mengembalikan DataFrame dan objek worksheet untuk update password.
+    """
+    try:
+        gc = get_gspread_client()
+        sh = gc.open_by_key(SHEET_KEY_DB)
+        ws = sh.worksheet(WORKSHEET_NAME_DB)
+        data = ws.get_all_records()
+
+        if not data:
+            st.warning("⚠️ Spreadsheet kosong atau belum berisi data pengguna.")
+            return pd.DataFrame(columns=[
+                "No", "Email", "Name", "StudentID", "Faculty", "Batch", "Password", "PasswordHash"
+            ]), ws
+
+        df = pd.DataFrame(data)
+
+        # Pastikan semua kolom ada
+        required_cols = ["StudentID", "Password", "PasswordHash"]
+        for col in required_cols:
+            if col not in df.columns:
+                df[col] = None
+
+        return df, ws
+
+    except Exception as e:
+        st.error(f"❌ Gagal memuat database: {e}")
+        # fallback: dataframe kosong agar tidak crash
+        return pd.DataFrame(columns=[
+            "No", "Email", "Name", "StudentID", "Faculty", "Batch", "Password", "PasswordHash"
+        ]), None
 
 # === LOGIN ===
 def login():
