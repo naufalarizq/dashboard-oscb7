@@ -98,7 +98,7 @@ if not df_clean.empty:
         total_points = df_user_points["Points"].sum()
         
         with st.expander("Change Password 🔑"):
-        change_password()
+            change_password()
 
         # ✅ Tampilkan metric berdampingan
         col1, col2 = st.columns(2)
