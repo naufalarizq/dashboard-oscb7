@@ -25,7 +25,7 @@ def get_gspread_client():
 
 #load user database
 # ✅ Load user database dan worksheet-nya
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl=10)
 def load_user_database():
     """
     Mengambil data user dari Google Spreadsheet.
@@ -79,12 +79,10 @@ def login():
 
         if st.button("Login"):
             hashed_pw = hash_password(password)
+
             user = df[
                 (df["StudentID"].astype(str).str.strip() == str(nim).strip()) &
-                (
-                    (df["Password"].astype(str) == str(password))|
-                    (df["PasswordHash"] == hash_password(password))
-                )
+                (df["PasswordHash"] == hashed_pw)
             ]
 
             if not user.empty:
@@ -111,7 +109,6 @@ def login():
         return True
 
     return st.session_state.logged_in
-
 
 # === GANTI PASSWORD ===
 def change_password():
