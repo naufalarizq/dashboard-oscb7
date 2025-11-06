@@ -22,6 +22,8 @@ if not df_clean.empty:
 
     total_records = len(df_clean.dropna(subset=['StudentID']))
     st.metric("Total Recorded Achievements", value=total_records)
+    
+    st.markdown("---")
 
     category_counts = df_clean['Category'].value_counts().reindex(CATEGORY_ORDER, fill_value=0)
     cols = st.columns(len(category_counts))
