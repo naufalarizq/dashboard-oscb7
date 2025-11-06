@@ -104,7 +104,7 @@ def change_password():
 
         df, ws = load_user_database()
         user_id = st.session_state.user_id
-        user_idx = df.index[df["Student ID"].astype(str) == str(user_id)].tolist()
+        user_idx = df.index[df["StudentID"].astype(str) == str(user_id)].tolist()
 
         if not user_idx:
             st.error("User not found in database.")
