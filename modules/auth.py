@@ -27,7 +27,7 @@ def get_gspread_client():
 @st.cache_data
 def load_user_database():
     gc = get_gspread_client()
-    sh = gc.open_by_key(SHEET_KEY_DB    )
+    sh = gc.open_by_key(SHEET_KEY_DB)
     ws = sh.worksheet(WORKSHEET_NAME_DB)
     data = ws.get_all_records()
     return pd.DataFrame(data), ws
@@ -52,14 +52,14 @@ def login():
         if st.button("Login"):
             hashed_pw = hash_password(password)
             user = df[
-                (df["Student ID"].astype(str) == nim) &
+                (df["StudentID"].astype(str) == nim) &
                 ((df["Password"] == password) | (df["PasswordHash"] == hashed_pw))
             ]
 
             if not user.empty:
                 user_data = user.iloc[0]
                 st.session_state.logged_in = True
-                st.session_state.user_id = user_data["Student ID"]
+                st.session_state.user_id = user_data["StudentID"]
                 st.session_state.user_name = user_data["Name"]
                 st.session_state.user_faculty = user_data["Faculty"]
                 st.session_state.user_batch = user_data["Batch"]
