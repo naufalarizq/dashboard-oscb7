@@ -52,8 +52,11 @@ def login():
         if st.button("Login"):
             hashed_pw = hash_password(password)
             user = df[
-                (df["StudentID"].astype(str) == nim) &
-                ((df["Password"] == password) | (df["PasswordHash"] == hashed_pw))
+                (df["StudentID"].astype(str).str.strip() == str(nim).strip()) &
+                (
+                    (df["Password"].astype(str) == str(password))|
+                    (df["PasswordHash"] == hash_password(password))
+                )
             ]
 
             if not user.empty:
