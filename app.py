@@ -51,6 +51,15 @@ if not df_clean.empty:
             use_container_width=True, hide_index=True
         )
 
+    def open_submission_link(url: str):
+        """Show a clickable link that opens the submission form in a new tab."""
+        st.markdown(
+            f'<a href="{url}" target="_blank" rel="noopener noreferrer">Open Submission Form</a>',
+            unsafe_allow_html=True,
+        )
+    if st.button("Submit Achievement"):
+        st.cache_data.clear()
+        open_submission_link("https://ipb.link/achievement-report-oscb7")
     st.markdown("---")
 
     # === Grafik Umum ===
