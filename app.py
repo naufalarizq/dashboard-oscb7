@@ -35,7 +35,7 @@ if not df_clean.empty:
     # === Leaderboard Umum ===
     st.header("🏅 Top 5 Students by Batch")
     df_points = calculate_points(df_clean.copy())
-    leaderboard = df_points.groupby(['StudentID', 'FullName'])['Points'].sum().reset_index()
+    leaderboard = df_points.groupby(['StudentID', 'FullName', 'Batch'])['Points'].sum().reset_index()
 
     col1, col2, col3 = st.columns(3)
     with col1:
