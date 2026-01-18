@@ -6,8 +6,10 @@ from modules.auth import get_gspread_client
 
 @st.cache_data(ttl=60)
 def load_clean_data():
-    SHEET_KEY = "1LoptadYNUgEJ9fHJShdwwCz2O-F-cxLAJ6YgucO2UrA"
-    WORKSHEET_NAME = "OlahData"
+    # SHEET_KEY = "1LoptadYNUgEJ9fHJShdwwCz2O-F-cxLAJ6YgucO2UrA"
+    SHEET_KEY = "1Z_B-LYO3-EtTWliyXEm_8TJREwGEQaKN-5p1T68K484"
+    # WORKSHEET_NAME = "OlahData"
+    WORKSHEET_NAME = "ImportData"
 
     try:
         client = get_gspread_client()
