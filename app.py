@@ -35,9 +35,9 @@ if not df_clean.empty:
     # === Leaderboard Umum ===
     st.header("🏅 Top 5 Students by Batch")
     df_points = calculate_points(df_clean.copy())
-    leaderboard = df_points.groupby(['StudentID', 'FullName', 'Batch'])['Points'].sum().reset_index()
+    leaderboard = df_points.groupby(['StudentID', 'FullName'])['Points'].sum().reset_index()
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.subheader("Batch 60")
         st.dataframe(
@@ -48,6 +48,13 @@ if not df_clean.empty:
         st.subheader("Batch 61")
         st.dataframe(
             leaderboard[leaderboard['Batch'] == 61].nlargest(5, 'Points'),
+            use_container_width=True, hide_index=True
+        )
+
+    with col3:
+        st.subheader("Batch 62")
+        st.dataframe(
+            leaderboard[leaderboard['Batch'] == 62].nlargest(5, 'Points'),
             use_container_width=True, hide_index=True
         )
 
@@ -64,7 +71,7 @@ if not df_clean.empty:
 
     # === Grafik Umum ===
     st.header("📊 Achievement Distribution")
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.subheader("By Faculty")
         faculty_chart(df_clean, FACULTY_ORDER)
