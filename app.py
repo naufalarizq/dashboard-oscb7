@@ -41,20 +41,20 @@ if not df_clean.empty:
     with col1:
         st.subheader("Batch 60")
         st.dataframe(
-            leaderboard[leaderboard['Batch'] == 60].nlargest(5, 'Points'),
+            leaderboard[leaderboard['Batch'] == 60].nlargest(5, 'Points').drop(columns=['Batch']),
             use_container_width=True, hide_index=True
         )
     with col2:
         st.subheader("Batch 61")
         st.dataframe(
-            leaderboard[leaderboard['Batch'] == 61].nlargest(5, 'Points'),
+            leaderboard[leaderboard['Batch'] == 61].nlargest(5, 'Points').drop(columns=['Batch']),
             use_container_width=True, hide_index=True
         )
 
     with col3:
         st.subheader("Batch 62")
         st.dataframe(
-            leaderboard[leaderboard['Batch'] == 62].nlargest(5, 'Points'),
+            leaderboard[leaderboard['Batch'] == 62].nlargest(5, 'Points').drop(columns=['Batch']),
             use_container_width=True, hide_index=True
         )
 
