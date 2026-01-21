@@ -136,19 +136,19 @@ def calculate_points(df):
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "International"): 50,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "National"): 40,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "Province"): 30,
-        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "Local"): 20,
+        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "Local/IPB"): 20,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Pemrakarsa / Pendiri", "Institutional"): 10,
 
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "International"): 35,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "National"): 25,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "Province"): 15,
-        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "Local"): 10,
+        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "Local/IPB"): 10,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Koordinator Relawan", "Institutional"): 5,
 
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "International"): 25,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "National"): 15,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "Province"): 10,
-        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "Local"): 5,
+        ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "Local/IPB"): 5,
         ("Humanitarian Action (Pemberdayaan/Aksi Kemanusiaan)", "Relawan", "Institutional"): 3,
 
 
