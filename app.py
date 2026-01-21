@@ -36,6 +36,9 @@ if not df_clean.empty:
     st.header("🏅 Top 5 Students by Batch")
     df_points = calculate_points(df_clean.copy())
     leaderboard = df_points.groupby(['StudentID', 'FullName', 'Batch'])['Points'].sum().reset_index()
+    
+    # Filter: hanya tampilkan yang memiliki poin > 0
+    leaderboard = leaderboard[leaderboard['Points'] > 0]
 
     col1, col2, col3 = st.columns(3)
     with col1:

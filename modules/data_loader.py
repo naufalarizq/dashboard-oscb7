@@ -6,10 +6,8 @@ from modules.auth import get_gspread_client
 
 @st.cache_data(ttl=60)
 def load_clean_data():
-    # SHEET_KEY = "1LoptadYNUgEJ9fHJShdwwCz2O-F-cxLAJ6YgucO2UrA"
-    SHEET_KEY = "1Z_B-LYO3-EtTWliyXEm_8TJREwGEQaKN-5p1T68K484"
-    # WORKSHEET_NAME = "OlahData"
-    WORKSHEET_NAME = "ImportData"
+    SHEET_KEY = "1LoptadYNUgEJ9fHJShdwwCz2O-F-cxLAJ6YgucO2UrA"
+    WORKSHEET_NAME = "OlahData"
 
     try:
         client = get_gspread_client()
@@ -29,6 +27,24 @@ def load_clean_data():
 
         if 'Batch' in df.columns:
             df['Batch'] = pd.to_numeric(df['Batch'], errors='coerce').astype('Int64')
+
+        # --- MERGE DENGAN DATABASE SCHOLARS UNTUK NAMA YANG KONSISTEN ---
+        from modules.auth import load_user_database
+        df_users, _ = load_user_database()
+
+        if not df_users.empty and "StudentID" in df.columns:
+            # Pastikan tipe data sama
+            df["StudentID"] = df["StudentID"].astype(str).str.strip()
+            df_users["StudentID"] = df_users["StudentID"].astype(str).str.strip()
+            
+            # Merge left agar data prestasi tidak hilang, tapi ambil nama dari DB Scholars
+            df = df.merge(df_users[["StudentID", "Name"]], on="StudentID", how="left")
+            
+            # Jika ada nama di DatabaseScholars, gunakan itu. Jika tidak, tetap pakai FullName lama (atau kosong)
+            df["FullName"] = df["Name"].fillna(df["FullName"] if "FullName" in df.columns else pd.NA)
+            
+            # Hapus kolom bantuan
+            df.drop(columns=["Name"], inplace=True)
 
         return df
 
