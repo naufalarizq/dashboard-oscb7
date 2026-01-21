@@ -37,11 +37,11 @@ def load_clean_data():
             df["StudentID"] = df["StudentID"].astype(str).str.strip()
             df_users["StudentID"] = df_users["StudentID"].astype(str).str.strip()
             
-            # Merge left agar data prestasi tidak hilang, tapi ambil nama dari DB Scholars
-            df = df.merge(df_users[["StudentID", "Name"]], on="StudentID", how="left")
+            # Merge inner agar hanya mahasiswa yang ada di DatabaseScholars yang diambil datanya
+            df = df.merge(df_users[["StudentID", "Name"]], on="StudentID", how="inner")
             
-            # Jika ada nama di DatabaseScholars, gunakan itu. Jika tidak, tetap pakai FullName lama (atau kosong)
-            df["FullName"] = df["Name"].fillna(df["FullName"] if "FullName" in df.columns else pd.NA)
+            # Gunakan nama dari DatabaseScholars
+            df["FullName"] = df["Name"]
             
             # Hapus kolom bantuan
             df.drop(columns=["Name"], inplace=True)
