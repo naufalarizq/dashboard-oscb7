@@ -21,6 +21,21 @@ def load_clean_data():
         df = pd.DataFrame(data[1:], columns=data[0])
         df.replace(["#N/A", "#ERROR!", "#VALUE!", "#REF!", ""], pd.NA, inplace=True)
 
+        # Fix format for Entrepreneurship (Kewirausahaan) where columns are shifted left
+        if 'Category' in df.columns and 'Achievement' in df.columns:
+            mask = df['Category'] == 'Entrepreneurship (Kewirausahaan)'
+            if mask.any():
+                ach_idx = df.columns.get_loc('Achievement')
+                for idx, row in df[mask].iterrows():
+                    # Check if shifted: if Achievement looks like a date (contains '/')
+                    # or Level contains a link ('http')
+                    ach_val = str(row['Achievement']).strip()
+                    if '/' in ach_val or '-' in ach_val or 'http' in str(row.get('Level', '')).strip():
+                        # Shift values from ach_idx right by 1
+                        vals = row.values[ach_idx:-1]
+                        df.loc[idx, df.columns[ach_idx+1:]] = vals
+                        df.loc[idx, 'Achievement'] = 'Kewirausahaan'
+
         if 'Year' in df.columns:
             df['Achievement_Date'] = pd.to_datetime(df['Year'], format='%m/%d/%Y', errors='coerce')
             df['Month_Year'] = df['Achievement_Date'].dt.to_period('M').astype(str)
